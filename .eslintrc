@@ -4,5 +4,10 @@
   "env": {
     "browser": true,
     "jest": true
+  },
+  "rules": {
+    "react/prefer-stateless-function": 0,
+    "import/prefer-default-export": 0,
+    "react/prop-types": 0
   }
 }

@@ -1,7 +1,8 @@
-/* eslint-disable react/prefer-stateless-function */
-
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import { connect } from 'react-redux';
+import { loadWeather } from '../AC';
+import { REFRESH_INTERVAL } from '../constants';
 
 const Wrapper = styled.main`
   display: grid;
@@ -73,20 +74,48 @@ const getTimesOfDay = () => {
   return hours >= 22 || hours <= 6 ? 'night' : 'day';
 };
 
+const getCelsiusFromKelvin = temp => Math.round(temp - 273.15);
+
 class Weather extends Component {
+  componentDidMount() {
+    // console.log('cwm');
+    const { loading } = this.props;
+    if (Date.now() - this.props.weather.timestamp > REFRESH_INTERVAL && !loading) {
+      this.props.loadWeather(this.props.weather.name);
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // console.log('cwrp');
+    const { loading } = nextProps;
+    if (Date.now() - nextProps.weather.timestamp > REFRESH_INTERVAL && !loading) {
+      this.props.loadWeather(nextProps.weather.name);
+    }
+  }
+
   render() {
-    // FIXME
-    const weatherID = '802';
-    const temp = 10;
-    const humidity = 70;
-    const wind = 5;
+    const { loading } = this.props;
+    const { weatherID, name, temp, humidity, wind } = this.props.weather;
 
     const weatherClass = `wi wi-owm-${getTimesOfDay()}-${weatherID}`;
 
-    return (
-      <Wrapper temp={temp}>
+    const weatherBody = (() => {
+      if (Object.keys(this.props.weather).length === 0 && !loading) {
+        return (
+          <Inner>
+            <h1>Add city or choose current location</h1>
+          </Inner>
+        );
+      } else if (loading) {
+        return (
+          <Inner>
+            <h1>Loading weather...</h1>
+          </Inner>
+        );
+      }
+      return (
         <Inner>
-          <CityName>Moscow</CityName>
+          <CityName>{name}</CityName>
 
           <IconWrapper>
             <Icon className={weatherClass} />
@@ -94,7 +123,7 @@ class Weather extends Component {
 
           <DetailWrapper>
             <Temp>
-              <span>{temp}</span>
+              <span>{getCelsiusFromKelvin(temp)}</span>
               <span className="wi wi-degrees" />
             </Temp>
 
@@ -109,9 +138,20 @@ class Weather extends Component {
             </Wind>
           </DetailWrapper>
         </Inner>
-      </Wrapper>
-    );
+      );
+    })();
+
+    return <Wrapper temp={getCelsiusFromKelvin(temp)}>{weatherBody}</Wrapper>;
   }
 }
 
-export default Weather;
+export default connect(
+  (state) => {
+    const { activeCity, cities, loading } = state;
+    return {
+      weather: Object.values(cities).filter(city => city.name === activeCity)[0] || {},
+      loading,
+    };
+  },
+  { loadWeather },
+)(Weather);

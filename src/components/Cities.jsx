@@ -1,7 +1,8 @@
-/* eslint-disable react/prefer-stateless-function */
-
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import { connect } from 'react-redux';
+import NewCityForm from './NewCityForm';
+import { loadWeather, deleteCity, changeCity /* loadFromLocal */ } from '../AC';
 
 const Sidebar = styled.aside`
   padding: 20px;
@@ -13,6 +14,20 @@ const List = styled.ul`
   margin: 30px 0;
   padding: 0;
   list-style-type: none;
+`;
+
+const RefreshButton = styled.i`
+  position: absolute;
+  top: 50%;
+  right: 24px;
+  transform: translateY(-50%);
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  opacity: 0;
+  cursor: pointer;
 `;
 
 const RemoveButton = styled.i`
@@ -46,7 +61,7 @@ const RemoveButton = styled.i`
 
 const Item = styled.li`
   position: relative;
-  font-weight: ${props => (props.active ? 'bold' : 'normal')};
+  font-weight: ${props => (props.active === 'true' ? 'bold' : 'normal')};
   cursor: pointer;
 
   &:not(:last-child) {
@@ -57,59 +72,71 @@ const Item = styled.li`
     font-weight: bold;
   }
 
-  &:hover ${RemoveButton} {
+  &:hover ${RemoveButton}, &:hover ${RefreshButton} {
     opacity: 1;
   }
 `;
 
-const Form = styled.form``;
-
-const Input = styled.input`
-  display: block;
-  margin: 0 auto 10px;
-  padding: 5px 10px;
-  width: 100%;
-  box-sizing: border-box;
-  font-family: 'Oswald', sand-serif;
-  color: #fff;
-  border: 1px solid #fff;
-  background-color: transparent;
-`;
-
-const Button = styled.button`
-  display: block;
-  margin: 0 auto 10px;
-  padding: 5px 12px;
-  background-color: #233884;
-  font-family: 'Oswald', sand-serif;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-`;
-
 class Cities extends Component {
+  // componentDidMount() {
+  //   if (localStorage.weather !== undefined) {
+  //     this.props.loadFromLocal();
+  //   }
+  // }
+
   render() {
+    const { activeCity, cities } = this.props;
+
+    const cityList = Object.values(cities).map((city) => {
+      const active = activeCity === city.name ? 'true' : 'false';
+
+      return (
+        <Item
+          key={city.name}
+          active={active}
+          onClick={() => {
+            this.props.changeCity(city.name);
+          }}
+        >
+          {city.name}
+          <RefreshButton
+            title="Refresh weather"
+            onClick={(e) => {
+              e.stopPropagation();
+              this.props.loadWeather(city.name);
+            }}
+          />
+          <RemoveButton
+            title="Remove city"
+            onClick={(e) => {
+              e.stopPropagation();
+              this.props.deleteCity(city.name);
+            }}
+          />
+        </Item>
+      );
+    });
+
     return (
       <Sidebar>
         <List>
-          <Item>
-            Current location<RemoveButton />
-          </Item>
-          <Item active>
-            Moscow<RemoveButton />
-          </Item>
-          <Item>
-            Saint-P<RemoveButton />
-          </Item>
+          <Item>Current location</Item>
+          {cityList}
         </List>
 
-        <Form onSubmit={e => e.preventDefault()}>
-          <Input type="text" />
-          <Button>Add city</Button>
-        </Form>
+        <NewCityForm />
       </Sidebar>
     );
   }
 }
 
-export default Cities;
+export default connect(
+  (state) => {
+    const { activeCity, cities } = state;
+    return {
+      activeCity,
+      cities,
+    };
+  },
+  { loadWeather, deleteCity, changeCity } /* loadFromLocal */,
+)(Cities);

@@ -1,5 +1,3 @@
-/* eslint-disable react/prefer-stateless-function */
-
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import Cities from './Cities';
