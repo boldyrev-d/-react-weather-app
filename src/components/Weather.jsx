@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { loadWeather, loadCurrent, resetError } from '../AC';
@@ -77,6 +78,27 @@ const getTimesOfDay = () => {
 const getCelsiusFromKelvin = temp => Math.round(temp - 273.15);
 
 class Weather extends Component {
+  static propTypes = {
+    // from connect
+    weather: PropTypes.shape({
+      humidity: PropTypes.number,
+      name: PropTypes.string,
+      temp: PropTypes.number,
+      timestamp: PropTypes.number,
+      weatherID: PropTypes.number,
+      wind: PropTypes.number,
+    }).isRequired,
+    loading: PropTypes.bool.isRequired,
+    geolocation: PropTypes.bool.isRequired,
+    error: PropTypes.shape({
+      isError: PropTypes.bool.isRequired,
+      text: PropTypes.string.isRequired,
+    }).isRequired,
+    loadWeather: PropTypes.func.isRequired,
+    loadCurrent: PropTypes.func.isRequired,
+    resetError: PropTypes.func.isRequired,
+  };
+
   componentDidMount() {
     const { error: { isError } } = this.props;
     if (isError) {

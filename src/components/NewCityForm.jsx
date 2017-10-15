@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { loadWeather } from '../AC';
@@ -29,6 +30,11 @@ const SubmitButton = styled.button`
 `;
 
 class NewCityForm extends Component {
+  static propTypes = {
+    // from connect
+    loadWeather: PropTypes.func.isRequired,
+  };
+
   state = {
     text: '',
   };

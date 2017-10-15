@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import NewCityForm from './NewCityForm';
@@ -79,7 +80,17 @@ const Item = styled.li`
 `;
 
 const Cities = (props) => {
-  const { activeCity, cities, geolocation } = props;
+  /* eslint-disable no-shadow */
+  const {
+    activeCity,
+    cities,
+    geolocation,
+    loadWeather,
+    deleteCity,
+    changeCity,
+    loadCurrent,
+  } = props;
+  /* eslint-enable no-shadow */
 
   const cityList = Object.values(cities).map((city) => {
     const active = activeCity === city.name ? 'true' : 'false';
@@ -89,7 +100,7 @@ const Cities = (props) => {
         key={city.name}
         active={active}
         onClick={() => {
-          props.changeCity(city.name);
+          changeCity(city.name);
         }}
       >
         {city.name}
@@ -97,14 +108,14 @@ const Cities = (props) => {
           title="Refresh weather"
           onClick={(e) => {
             e.stopPropagation();
-            props.loadWeather(city.name);
+            loadWeather(city.name);
           }}
         />
         <RemoveButton
           title="Remove city"
           onClick={(e) => {
             e.stopPropagation();
-            props.deleteCity(city.name);
+            deleteCity(city.name);
           }}
         />
       </Item>
@@ -114,7 +125,7 @@ const Cities = (props) => {
   return (
     <Sidebar>
       <List>
-        <Item active={geolocation ? 'true' : 'false'} onClick={() => props.loadCurrent()}>
+        <Item active={geolocation ? 'true' : 'false'} onClick={() => loadCurrent()}>
           Current location
         </Item>
         {cityList}
@@ -123,6 +134,26 @@ const Cities = (props) => {
       <NewCityForm />
     </Sidebar>
   );
+};
+
+Cities.propTypes = {
+  // from connect
+  activeCity: PropTypes.string.isRequired,
+  cities: PropTypes.objectOf(
+    PropTypes.shape({
+      humidity: PropTypes.number,
+      name: PropTypes.string,
+      temp: PropTypes.number,
+      timestamp: PropTypes.number,
+      weatherID: PropTypes.number,
+      wind: PropTypes.number,
+    }),
+  ).isRequired,
+  geolocation: PropTypes.bool.isRequired,
+  loadWeather: PropTypes.func.isRequired,
+  deleteCity: PropTypes.func.isRequired,
+  changeCity: PropTypes.func.isRequired,
+  loadCurrent: PropTypes.func.isRequired,
 };
 
 export default connect(
