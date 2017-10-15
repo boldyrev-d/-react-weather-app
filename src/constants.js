@@ -1,5 +1,4 @@
-// TODO: change refresh interval in production
-export const REFRESH_INTERVAL = 1000 * 10; // 10 sec
+export const REFRESH_INTERVAL = 1000 * 60 * 30; // 30 min
 
 export const CHANGE_CITY = 'CHANGE_CITY';
 export const DELETE_CITY = 'DELETE_CITY';
