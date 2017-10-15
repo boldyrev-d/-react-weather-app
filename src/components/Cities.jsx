@@ -61,6 +61,7 @@ const RemoveButton = styled.i`
 
 const Item = styled.li`
   position: relative;
+  padding-right: 55px;
   font-weight: ${props => (props.active === 'true' ? 'bold' : 'normal')};
   cursor: pointer;
 
