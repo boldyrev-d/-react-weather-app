@@ -92,7 +92,6 @@ export const loadCurrent = () => (dispatch) => {
         }, 300);
       },
       (error) => {
-        console.log(error);
         if (error.code === 1) {
           dispatch({
             type: LOAD_CURRENT + FAIL,
