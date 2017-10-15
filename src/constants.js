@@ -9,4 +9,6 @@ export const START = '_START';
 export const SUCCESS = '_SUCCESS';
 export const FAIL = '_FAIL';
 
+export const RESET_ERROR = 'RESET_ERROR';
+
 export const LOAD_TO_LOCAL = 'LOAD_TO_LOCAL';

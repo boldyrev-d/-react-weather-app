@@ -7,6 +7,7 @@ import {
   START,
   SUCCESS,
   FAIL,
+  RESET_ERROR,
 } from '../constants';
 import { getWeatherByCity, getWeatherByLoc } from '../api';
 
@@ -26,6 +27,14 @@ export const loadWeather = name => (dispatch) => {
           type: LOAD_WEATHER + SUCCESS,
           payload: {
             ...response,
+          },
+        });
+      })
+      .catch((error) => {
+        dispatch({
+          type: LOAD_WEATHER + FAIL,
+          payload: {
+            text: error.message,
           },
         });
       })
@@ -83,6 +92,7 @@ export const loadCurrent = () => (dispatch) => {
         }, 300);
       },
       (error) => {
+        console.log(error);
         if (error.code === 1) {
           dispatch({
             type: LOAD_CURRENT + FAIL,
@@ -110,3 +120,7 @@ export const loadCurrent = () => (dispatch) => {
     });
   }
 };
+
+export const resetError = () => ({
+  type: RESET_ERROR,
+});

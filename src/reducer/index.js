@@ -7,6 +7,7 @@ import {
   START,
   SUCCESS,
   FAIL,
+  RESET_ERROR,
 } from '../constants';
 
 const localState = localStorage.getItem('weather');
@@ -52,6 +53,17 @@ export default (state = defaultState, action) => {
         error: {
           isError: false,
           text: '',
+        },
+      };
+
+    case LOAD_WEATHER + FAIL:
+      return {
+        ...state,
+        loading: false,
+        geolocation: false,
+        error: {
+          isError: true,
+          text: payload.text,
         },
       };
 
@@ -119,6 +131,15 @@ export default (state = defaultState, action) => {
     case LOAD_TO_LOCAL:
       localStorage.setItem('weather', JSON.stringify(state));
       return state;
+
+    case RESET_ERROR:
+      return {
+        ...state,
+        error: {
+          isError: false,
+          text: '',
+        },
+      };
 
     default:
       return state;

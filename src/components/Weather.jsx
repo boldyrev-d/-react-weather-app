@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { loadWeather, loadCurrent } from '../AC';
+import { loadWeather, loadCurrent, resetError } from '../AC';
 import { REFRESH_INTERVAL } from '../constants';
 
 const Wrapper = styled.main`
@@ -78,6 +78,11 @@ const getCelsiusFromKelvin = temp => Math.round(temp - 273.15);
 
 class Weather extends Component {
   componentDidMount() {
+    const { error: { isError } } = this.props;
+    if (isError) {
+      this.props.resetError();
+    }
+
     this.init(this.props);
   }
 
@@ -87,6 +92,7 @@ class Weather extends Component {
 
   init = (propsSource) => {
     const { loading, weather } = propsSource;
+
     if (Date.now() - weather.timestamp > REFRESH_INTERVAL && !loading) {
       if (propsSource.geolocation) {
         this.props.loadCurrent();
@@ -106,8 +112,8 @@ class Weather extends Component {
       if (
         Object.keys(this.props.weather).length === 0 &&
         !loading &&
-        !geolocation
-        // !error.isError
+        !geolocation &&
+        !error.isError
       ) {
         return (
           <Inner>
@@ -173,5 +179,5 @@ export default connect(
       error,
     };
   },
-  { loadWeather, loadCurrent },
+  { loadWeather, loadCurrent, resetError },
 )(Weather);
