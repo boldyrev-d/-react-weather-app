@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import NewCityForm from './NewCityForm';
@@ -78,54 +78,52 @@ const Item = styled.li`
   }
 `;
 
-class Cities extends Component {
-  render() {
-    const { activeCity, cities, geolocation } = this.props;
+const Cities = (props) => {
+  const { activeCity, cities, geolocation } = props;
 
-    const cityList = Object.values(cities).map((city) => {
-      const active = activeCity === city.name ? 'true' : 'false';
-
-      return (
-        <Item
-          key={city.name}
-          active={active}
-          onClick={() => {
-            this.props.changeCity(city.name);
-          }}
-        >
-          {city.name}
-          <RefreshButton
-            title="Refresh weather"
-            onClick={(e) => {
-              e.stopPropagation();
-              this.props.loadWeather(city.name);
-            }}
-          />
-          <RemoveButton
-            title="Remove city"
-            onClick={(e) => {
-              e.stopPropagation();
-              this.props.deleteCity(city.name);
-            }}
-          />
-        </Item>
-      );
-    });
+  const cityList = Object.values(cities).map((city) => {
+    const active = activeCity === city.name ? 'true' : 'false';
 
     return (
-      <Sidebar>
-        <List>
-          <Item active={geolocation ? 'true' : 'false'} onClick={() => this.props.loadCurrent()}>
-            Current location
-          </Item>
-          {cityList}
-        </List>
-
-        <NewCityForm />
-      </Sidebar>
+      <Item
+        key={city.name}
+        active={active}
+        onClick={() => {
+          props.changeCity(city.name);
+        }}
+      >
+        {city.name}
+        <RefreshButton
+          title="Refresh weather"
+          onClick={(e) => {
+            e.stopPropagation();
+            props.loadWeather(city.name);
+          }}
+        />
+        <RemoveButton
+          title="Remove city"
+          onClick={(e) => {
+            e.stopPropagation();
+            props.deleteCity(city.name);
+          }}
+        />
+      </Item>
     );
-  }
-}
+  });
+
+  return (
+    <Sidebar>
+      <List>
+        <Item active={geolocation ? 'true' : 'false'} onClick={() => props.loadCurrent()}>
+          Current location
+        </Item>
+        {cityList}
+      </List>
+
+      <NewCityForm />
+    </Sidebar>
+  );
+};
 
 export default connect(
   (state) => {

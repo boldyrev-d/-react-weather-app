@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import Cities from './Cities';
 import Weather from './Weather';
@@ -11,15 +11,11 @@ const PageWrapper = styled.div`
   font-family: 'Oswald', sans-serif;
 `;
 
-class App extends Component {
-  render() {
-    return (
-      <PageWrapper>
-        <Cities />
-        <Weather />
-      </PageWrapper>
-    );
-  }
-}
+const App = () => (
+  <PageWrapper>
+    <Cities />
+    <Weather />
+  </PageWrapper>
+);
 
 export default App;
