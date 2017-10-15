@@ -78,12 +78,6 @@ const Item = styled.li`
 `;
 
 class Cities extends Component {
-  // componentDidMount() {
-  //   if (localStorage.weather !== undefined) {
-  //     this.props.loadFromLocal();
-  //   }
-  // }
-
   render() {
     const { activeCity, cities } = this.props;
 
@@ -138,5 +132,5 @@ export default connect(
       cities,
     };
   },
-  { loadWeather, deleteCity, changeCity } /* loadFromLocal */,
+  { loadWeather, deleteCity, changeCity },
 )(Cities);

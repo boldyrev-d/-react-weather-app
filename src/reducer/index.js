@@ -1,27 +1,17 @@
 import {
   DELETE_CITY,
   CHANGE_CITY,
-  // LOAD_FROM_LOCAL,
-  // LOAD_TO_LOCAL,
+  LOAD_TO_LOCAL,
   LOAD_WEATHER,
   START,
   SUCCESS,
 } from '../constants';
 
-const defaultState = {
-  currentLocation: {},
-  // activeCity: 'Moscow',
+const localState = localStorage.getItem('weather');
+const defaultState = (localState && JSON.parse(localState)) || {
   activeCity: '',
-  cities: {
-    // Moscow: {
-    //   name: 'Moscow',
-    //   weatherID: 802,
-    //   temp: 300,
-    //   humidity: 50,
-    //   wind: 2,
-    //   timestamp: 1507824245501,
-    // },
-  },
+  cities: {},
+  currentLocation: {},
   loading: false,
 };
 
@@ -74,15 +64,9 @@ export default (state = defaultState, action) => {
 
       return state;
 
-    // case LOAD_FROM_LOCAL:
-    //   return {
-    //     ...state,
-    //     ...payload.weather,
-    //   };
-
-    // case LOAD_TO_LOCAL:
-    //   localStorage.setItem('weather', JSON.stringify(state));
-    //   return state;
+    case LOAD_TO_LOCAL:
+      localStorage.setItem('weather', JSON.stringify(state));
+      return state;
 
     default:
       return state;

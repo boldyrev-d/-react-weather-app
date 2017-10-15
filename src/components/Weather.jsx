@@ -78,7 +78,6 @@ const getCelsiusFromKelvin = temp => Math.round(temp - 273.15);
 
 class Weather extends Component {
   componentDidMount() {
-    // console.log('cwm');
     const { loading } = this.props;
     if (Date.now() - this.props.weather.timestamp > REFRESH_INTERVAL && !loading) {
       this.props.loadWeather(this.props.weather.name);
@@ -86,7 +85,6 @@ class Weather extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.log('cwrp');
     const { loading } = nextProps;
     if (Date.now() - nextProps.weather.timestamp > REFRESH_INTERVAL && !loading) {
       this.props.loadWeather(nextProps.weather.name);
