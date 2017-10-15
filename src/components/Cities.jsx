@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import NewCityForm from './NewCityForm';
-import { loadWeather, deleteCity, changeCity /* loadFromLocal */ } from '../AC';
+import { loadWeather, deleteCity, changeCity, loadCurrent } from '../AC';
 
 const Sidebar = styled.aside`
   padding: 20px;
@@ -80,7 +80,7 @@ const Item = styled.li`
 
 class Cities extends Component {
   render() {
-    const { activeCity, cities } = this.props;
+    const { activeCity, cities, geolocation } = this.props;
 
     const cityList = Object.values(cities).map((city) => {
       const active = activeCity === city.name ? 'true' : 'false';
@@ -115,7 +115,9 @@ class Cities extends Component {
     return (
       <Sidebar>
         <List>
-          <Item>Current location</Item>
+          <Item active={geolocation ? 'true' : 'false'} onClick={() => this.props.loadCurrent()}>
+            Current location
+          </Item>
           {cityList}
         </List>
 
@@ -127,11 +129,12 @@ class Cities extends Component {
 
 export default connect(
   (state) => {
-    const { activeCity, cities } = state;
+    const { activeCity, cities, geolocation } = state;
     return {
       activeCity,
       cities,
+      geolocation,
     };
   },
-  { loadWeather, deleteCity, changeCity },
+  { loadWeather, deleteCity, changeCity, loadCurrent },
 )(Cities);

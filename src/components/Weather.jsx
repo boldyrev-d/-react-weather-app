@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { loadWeather } from '../AC';
+import { loadWeather, loadCurrent } from '../AC';
 import { REFRESH_INTERVAL } from '../constants';
 
 const Wrapper = styled.main`
@@ -78,27 +78,32 @@ const getCelsiusFromKelvin = temp => Math.round(temp - 273.15);
 
 class Weather extends Component {
   componentDidMount() {
-    const { loading } = this.props;
-    if (Date.now() - this.props.weather.timestamp > REFRESH_INTERVAL && !loading) {
-      this.props.loadWeather(this.props.weather.name);
-    }
+    this.init(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { loading } = nextProps;
-    if (Date.now() - nextProps.weather.timestamp > REFRESH_INTERVAL && !loading) {
-      this.props.loadWeather(nextProps.weather.name);
-    }
+    this.init(nextProps);
   }
 
+  init = (propsSource) => {
+    const { loading, weather } = propsSource;
+    if (Date.now() - weather.timestamp > REFRESH_INTERVAL && !loading) {
+      if (propsSource.geolocation) {
+        this.props.loadCurrent();
+      } else {
+        this.props.loadWeather(weather.name);
+      }
+    }
+  };
+
   render() {
-    const { loading } = this.props;
+    const { loading, geolocation } = this.props;
     const { weatherID, name, temp, humidity, wind } = this.props.weather;
 
     const weatherClass = `wi wi-owm-${getTimesOfDay()}-${weatherID}`;
 
     const weatherBody = (() => {
-      if (Object.keys(this.props.weather).length === 0 && !loading) {
+      if (Object.keys(this.props.weather).length === 0 && !loading && !geolocation) {
         return (
           <Inner>
             <h1>Add city or choose current location</h1>
@@ -145,11 +150,16 @@ class Weather extends Component {
 
 export default connect(
   (state) => {
-    const { activeCity, cities, loading } = state;
+    const { activeCity, cities, currentLocationWeather, geolocation, loading } = state;
+
     return {
-      weather: Object.values(cities).filter(city => city.name === activeCity)[0] || {},
+      weather:
+        Object.values(cities).filter(city => city.name === activeCity)[0] ||
+        (geolocation && currentLocationWeather) ||
+        {},
       loading,
+      geolocation,
     };
   },
-  { loadWeather },
+  { loadWeather, loadCurrent },
 )(Weather);
