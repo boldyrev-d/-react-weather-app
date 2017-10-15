@@ -97,13 +97,18 @@ class Weather extends Component {
   };
 
   render() {
-    const { loading, geolocation } = this.props;
+    const { loading, geolocation, error } = this.props;
     const { weatherID, name, temp, humidity, wind } = this.props.weather;
 
     const weatherClass = `wi wi-owm-${getTimesOfDay()}-${weatherID}`;
 
     const weatherBody = (() => {
-      if (Object.keys(this.props.weather).length === 0 && !loading && !geolocation) {
+      if (
+        Object.keys(this.props.weather).length === 0 &&
+        !loading &&
+        !geolocation
+        // !error.isError
+      ) {
         return (
           <Inner>
             <h1>Add city or choose current location</h1>
@@ -113,6 +118,12 @@ class Weather extends Component {
         return (
           <Inner>
             <h1>Loading weather...</h1>
+          </Inner>
+        );
+      } else if (error.isError) {
+        return (
+          <Inner>
+            <h1>{error.text}</h1>
           </Inner>
         );
       }
@@ -150,7 +161,7 @@ class Weather extends Component {
 
 export default connect(
   (state) => {
-    const { activeCity, cities, currentLocationWeather, geolocation, loading } = state;
+    const { activeCity, cities, currentLocationWeather, geolocation, loading, error } = state;
 
     return {
       weather:
@@ -159,6 +170,7 @@ export default connect(
         {},
       loading,
       geolocation,
+      error,
     };
   },
   { loadWeather, loadCurrent },

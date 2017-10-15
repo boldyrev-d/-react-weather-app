@@ -6,6 +6,7 @@ import {
   LOAD_WEATHER,
   START,
   SUCCESS,
+  FAIL,
 } from '../constants';
 import { getWeatherByCity, getWeatherByLoc } from '../api';
 
@@ -18,7 +19,6 @@ export const loadWeather = name => (dispatch) => {
     type: LOAD_WEATHER + START,
   });
 
-  // TODO: remove setTimeout in production
   setTimeout(() => {
     getWeatherByCity(name)
       .then((response) => {
@@ -73,7 +73,6 @@ export const loadCurrent = () => (dispatch) => {
           getWeatherByLoc(currentLat, currentLon)
             .then((response) => {
               dispatch({
-                // console.log('--- response', response);
                 type: LOAD_CURRENT + SUCCESS,
                 payload: {
                   ...response,
@@ -84,16 +83,30 @@ export const loadCurrent = () => (dispatch) => {
         }, 300);
       },
       (error) => {
-        // console.log(error);
         if (error.code === 1) {
-          console.log('--- ERROR ---', error.message);
+          dispatch({
+            type: LOAD_CURRENT + FAIL,
+            payload: {
+              text: 'Geolocation is denied',
+            },
+          });
         }
         if (error.code === 2) {
-          console.log('--- ERROR ---', error.message);
+          dispatch({
+            type: LOAD_CURRENT + FAIL,
+            payload: {
+              text: 'No response received. Check internet connection',
+            },
+          });
         }
       },
     );
   } else {
-    console.log('---', 'Geolocation unavailable');
+    dispatch({
+      type: LOAD_CURRENT + FAIL,
+      payload: {
+        text: 'Geolocation unavailablein browser',
+      },
+    });
   }
 };

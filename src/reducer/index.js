@@ -6,6 +6,7 @@ import {
   LOAD_WEATHER,
   START,
   SUCCESS,
+  FAIL,
 } from '../constants';
 
 const localState = localStorage.getItem('weather');
@@ -15,6 +16,10 @@ const defaultState = (localState && JSON.parse(localState)) || {
   currentLocationWeather: {},
   loading: false,
   geolocation: false,
+  error: {
+    isError: false,
+    text: '',
+  },
 };
 
 export default (state = defaultState, action) => {
@@ -31,7 +36,6 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         activeCity: payload.name,
-        loading: false,
         geolocation: false,
         cities: {
           ...state.cities,
@@ -44,17 +48,23 @@ export default (state = defaultState, action) => {
             timestamp: Date.now(),
           },
         },
+        loading: false,
+        error: {
+          isError: false,
+          text: '',
+        },
       };
 
     // eslint-disable-next-line no-case-declarations
     case DELETE_CITY:
-      const cities = Object.values(state.cities).filter(city => city.name !== payload.name);
+      const cities = { ...state.cities };
+      delete cities[payload.name];
 
       let activeCity;
       if (state.geolocation) {
         activeCity = '';
       } else {
-        activeCity = cities.length ? cities[0].name : '';
+        activeCity = Object.keys(cities).length ? Object.keys(cities)[0] : '';
       }
 
       return {
@@ -64,15 +74,15 @@ export default (state = defaultState, action) => {
       };
 
     case CHANGE_CITY:
-      if (state.activeCity !== payload.name) {
-        return {
-          ...state,
-          activeCity: payload.name,
-          geolocation: false,
-        };
-      }
-
-      return state;
+      return {
+        ...state,
+        activeCity: payload.name,
+        geolocation: false,
+        error: {
+          isError: false,
+          text: '',
+        },
+      };
 
     case LOAD_CURRENT + SUCCESS:
       return {
@@ -88,6 +98,22 @@ export default (state = defaultState, action) => {
           timestamp: Date.now(),
         },
         loading: false,
+        error: {
+          isError: false,
+          text: '',
+        },
+      };
+
+    case LOAD_CURRENT + FAIL:
+      return {
+        ...state,
+        loading: false,
+        activeCity: '',
+        geolocation: true,
+        error: {
+          isError: true,
+          text: payload.text,
+        },
       };
 
     case LOAD_TO_LOCAL:
